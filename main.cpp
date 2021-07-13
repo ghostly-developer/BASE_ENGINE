@@ -260,7 +260,7 @@ int main() {
 	lightShader.Delete();
 	//-----------------------------
 
-	
+
 	glfwDestroyWindow(window); //killing the window after we finish
 
 	glfwTerminate(); //terminating glfw after function

@@ -106,13 +106,13 @@ namespace roml {
 
 		//finding axis we're gonna rotate on
 		glm::vec3 axis = roml::normalize(normal);
-		glm::vec3 temp = glm::vec3((1 - cos(angle)) * axis);
+		glm::vec3 temp = glm::vec3((1 - cos(rotation)) * axis);
 
 		//Quaternian-ish dynamic rotate matrix
 		glm::mat4 rotMat = glm::mat4(1.0f);
-		rotMat[0] = glm::vec4(cos(angle) + temp.x * axis.x, temp.x * axis.y + sin(angle) * axis.z, temp.x * axis.z - sin(angle) * axis.y, 0);
-		rotMat[1] = glm::vec4(temp.y * axis.x - sin(angle) * axis.z, cos(angle) + temp.y * axis.y, temp.y * axis.z + sin(angle) * axis.x, 0);
-		rotMat[2] = glm::vec4(temp.z * axis.x + sin(angle) * axis.y, temp.z * axis.y - sin(angle) * axis.x, cos(angle) + temp.z * axis.z, 0);
+		rotMat[0] = glm::vec4(cos(rotation) + temp.x * axis.x, temp.x * axis.y + sin(rotation) * axis.z, temp.x * axis.z - sin(rotation) * axis.y, 0);
+		rotMat[1] = glm::vec4(temp.y * axis.x - sin(rotation) * axis.z, cos(rotation) + temp.y * axis.y, temp.y * axis.z + sin(rotation) * axis.x, 0);
+		rotMat[2] = glm::vec4(temp.z * axis.x + sin(rotation) * axis.y, temp.z * axis.y - sin(rotation) * axis.x, cos(rotation) + temp.z * axis.z, 0);
 		//No need to fill in the 4th row since the initialization of the result matrix takes care of that
 
 		result = rotMat * oldMat;
