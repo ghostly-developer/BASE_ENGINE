@@ -11,6 +11,7 @@ using namespace std;
 namespace roml {
 	glm::mat4 translate(glm::mat4 matrix, glm::vec3 camera);
 	glm::mat4 createPerspective(float FOV, float screenAspect, float nearClip, float farClip);
+	glm::mat4 rotate(glm::mat4 oldMat, float rotation, glm::vec3 normal);
 	glm::mat4 rotate(glm::mat4 oldMat, float rotation, char axis);
 	glm::vec3 rotate(glm::vec3 vector, float angle, glm::vec3 normal);
 	float inversesqrt(float x);
@@ -96,6 +97,26 @@ namespace roml {
 		}
 
 		throw new exception("Not a valid axis");
+	}
+
+	//Dynamic mat4 rotation
+	glm::mat4 rotate(glm::mat4 oldMat, float rotation, glm::vec3 normal) {
+		//result matrix
+		glm::mat4 result = glm::mat4(1.0f);
+
+		//finding axis we're gonna rotate on
+		glm::vec3 axis = roml::normalize(normal);
+		glm::vec3 temp = glm::vec3((1 - cos(angle)) * axis);
+
+		//Quaternian-ish dynamic rotate matrix
+		glm::mat4 rotMat = glm::mat4(1.0f);
+		rotMat[0] = glm::vec4(cos(angle) + temp.x * axis.x, temp.x * axis.y + sin(angle) * axis.z, temp.x * axis.z - sin(angle) * axis.y, 0);
+		rotMat[1] = glm::vec4(temp.y * axis.x - sin(angle) * axis.z, cos(angle) + temp.y * axis.y, temp.y * axis.z + sin(angle) * axis.x, 0);
+		rotMat[2] = glm::vec4(temp.z * axis.x + sin(angle) * axis.y, temp.z * axis.y - sin(angle) * axis.x, cos(angle) + temp.z * axis.z, 0);
+		//No need to fill in the 4th row since the initialization of the result matrix takes care of that
+
+		result = rotMat * oldMat;
+		return result;
 	}
 
 	//Gives the vec3 a length of 1
