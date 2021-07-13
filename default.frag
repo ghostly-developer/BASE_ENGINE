@@ -82,7 +82,7 @@ vec4 spotlight(){
 	vec3 viewDirection = normalize(camPos - crntPos);
 	vec3 reflectionDirection = reflect(-lightDirection, normal);
 
-	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16); //(last one controls how defined the specular light is)
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 32); //(last one controls how defined the specular light is)
 	float specular = specAmount * specularLight;
 
 	float angle = dot(vec3(0.0f, -1.0f, 0.0f), -lightDirection);

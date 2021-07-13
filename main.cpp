@@ -12,6 +12,19 @@
 #include<glm/glm.hpp>
 #include<glm/gtc/type_ptr.hpp>
 
+//IMGUI
+#include<imgui/imconfig.h>
+#include<imgui/imgui.h>
+#include<imgui/imgui.cpp>
+#include<imgui/imgui_demo.cpp>
+#include<imgui/imgui_draw.cpp>
+#include<imgui/imgui_impl_glfw_gl3.cpp>
+#include<imgui/imgui_impl_glfw_gl3.h>
+#include<imgui/imgui_internal.h>
+
+
+
+
 
 using namespace std;
 
@@ -183,37 +196,34 @@ int main() {
 	std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
 	Mesh pyramid(verts, ind, tex);
 
+	Shader lightShader("light.vert", "light.frag");
 	//GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale"); //get uniform reference value (stored in uniID)
 	GLuint timeID = glGetUniformLocation(shaderProgram.ID, "time");
 
 
 	auto startTime = get_millis_since_epoch();
 
-
-
-	Shader lightShader("light.vert", "light.frag");
-
+	//-----------------------------Lights------------------------------------------------------------------
 	std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
 	std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
 	Mesh light(lightVerts, lightInd, tex); //The tex is just a placeholder
+	//-----------------------------Lights------------------------------------------------------------------
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
-	lightModel = roml::translate(lightModel, lightPos);
+	
 
-	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	//--------------Pyramid---------------------------------
+	//Angle input
+	float angle = 0;
+	glm::vec3 scalepyr = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f); //X, Y, Z
 	glm::mat4 pyramidModel = glm::mat4(1.0f);
-	pyramidModel = roml::translate(pyramidModel, pyramidPos);
 
-	//Exporting data
-	lightShader.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
-	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	shaderProgram.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
-	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+	//--------------Pyramid---------------------------------
+
 
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f); //clears the colour of current background and replaces it. also this is navy blue
 	glClear(GL_COLOR_BUFFER_BIT); //le execute with the color buffer
@@ -222,6 +232,14 @@ int main() {
 	float rotation = 0.0f;
 	double prevTime = get_millis_since_epoch();
 	glEnable(GL_DEPTH_TEST); //fixes depth issues
+
+	//GUI
+	ImGui::CreateContext();
+	ImGui_ImplGlfwGL3_Init(window, true);
+
+	ImGui::StyleColorsDark();
+
+
 
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 	while (!glfwWindowShouldClose(window)) {
@@ -243,13 +261,104 @@ int main() {
 		//Tells opengl what shader program we're gonna use
 		shaderProgram.Activate();
 
+		//---------------------------------------------------------------------------------------------------------------------------------
+		lightModel = roml::translate(lightModel, lightPos);
+
+		//-----------------------Pyramid Control-----------------------------
+		/*pyramidModel = roml::rotate(pyramidModel, roml::radians(angle), 'Y');*/
+		glm::mat4 Loc = roml::translate(glm::mat4(1.0f), pyramidPos);
+		glm::mat4 Soc = roml::scale(glm::mat4(1.0f), scalepyr);
+
+		pyramidModel = Loc * Soc;
+		//-----------------------Pyramid Control-----------------------------
+
+		//Exporting data
+		lightShader.Activate();
+		glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+		glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+		shaderProgram.Activate();
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+		glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+		glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+		//---------------------------------------------------------------------------------------------------------------------------------
 		camera.Inputs(window); //Yay inputs!
 		//Updates and exports camera matrix to the vert shader
 		camera.updateMatrix(45.0f, 0.1f, 100.0f);
 
+		//IMGUI
+		ImGui_ImplGlfwGL3_NewFrame();
+
+		//---------------DRAW------------------
 		pyramid.Draw(shaderProgram, camera);
 		light.Draw(lightShader, camera);
+		//---------------DRAW------------------
 
+		{
+			ImGui::Begin("Debug Light");
+
+			bool resetPos = false;
+			ImGui::Text("Light Controls");   
+			ImGui::Dummy(ImVec2(0.0f, 5.0f));
+			ImGui::SliderFloat("Translation X", &lightPos.x, -10.0f, 10.0f); 
+			ImGui::SliderFloat("Translation Y", &lightPos.y, -10.0f, 10.0f);
+			ImGui::SliderFloat("Translation Z", &lightPos.z, -10.0f, 10.0f);
+			if (ImGui::Button("Reset Position"))
+				resetPos = true;
+
+			if (resetPos == true) {
+				lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+			}
+			ImGui::Dummy(ImVec2(0.0f, 5.0f));
+			ImGui::ColorEdit4("Color", (float*)&lightColor); // Edit 4 floats representing a color
+
+			ImGui::Dummy(ImVec2(0.0f, 5.0f));
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+			ImGui::End();
+		}
+
+		{
+			ImGui::Begin("Debug Mesh");
+
+			bool resetScale = false;
+			bool resetPos = false;
+			ImGui::Text("Mesh Controls");
+			ImGui::Dummy(ImVec2(0.0f, 5.0f));
+			ImGui::SliderFloat("Scale X", &scalepyr.x, 0.0f, 10.0f);
+			ImGui::SliderFloat("Scale Y", &scalepyr.y, 0.0f, 10.0f);
+			ImGui::SliderFloat("Scale Z", &scalepyr.z, 0.0f, 10.0f);
+
+			if (ImGui::Button("Reset Scale"))
+				resetScale = true;
+
+			if (resetScale == true) {
+				scalepyr.x = 1.0f;
+				scalepyr.y = 1.0f;
+				scalepyr.z = 1.0f;
+			}
+
+			ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+			ImGui::SliderFloat("Translation X", &pyramidPos.x, -10.0f, 10.0f);
+			ImGui::SliderFloat("Translation Y", &pyramidPos.y, -10.0f, 10.0f);
+			ImGui::SliderFloat("Translation Z", &pyramidPos.z, -10.0f, 10.0f);
+			if (ImGui::Button("Reset Position"))
+				resetPos = true;
+
+			if (resetPos == true) {
+				pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
+			}
+
+
+
+			ImGui::Dummy(ImVec2(0.0f, 5.0f));
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+			ImGui::End();
+		}
+
+		ImGui::Render();
+		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); //this is to make the window actually, respond.
@@ -263,6 +372,8 @@ int main() {
 
 	glfwDestroyWindow(window); //killing the window after we finish
 
+	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();
 	glfwTerminate(); //terminating glfw after function
 	return 0;
 }

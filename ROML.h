@@ -10,6 +10,7 @@
 using namespace std;
 namespace roml {
 	glm::mat4 translate(glm::mat4 matrix, glm::vec3 camera);
+	glm::mat4 scale(glm::mat4 mat, glm::vec3 scalar);
 	glm::mat4 createPerspective(float FOV, float screenAspect, float nearClip, float farClip);
 	glm::mat4 rotate(glm::mat4 oldMat, float rotation, glm::vec3 normal);
 	glm::mat4 rotate(glm::mat4 oldMat, float rotation, char axis);
@@ -35,7 +36,15 @@ namespace roml {
 		return result;
 	}
 
+	glm::mat4 scale(glm::mat4 mat, glm::vec3 scalar) {
+		glm::mat4 result = glm::mat4(1.0f);
 
+		result[0][0] = scalar.x * mat[0][0];
+		result[1][1] = scalar.y * mat[1][1];
+		result[2][2] = scalar.z * mat[2][2];
+		return result;
+
+	}
 	//Create Perspective Matrix
 	glm::mat4 createPerspective(float FOV, float screenAspect, float nearClip, float farClip) {
 		//Making it a zero matrix
