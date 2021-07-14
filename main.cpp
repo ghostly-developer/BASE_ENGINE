@@ -100,11 +100,11 @@ int main() {
 		Vertex{glm::vec3(-0.5f, 0.0f, -0.5f),  glm::vec3(0.83f, 0.70f, 0.44f),   glm::vec3(0.0f, -1.0f, 0.0f),        glm::vec2(0.0f, 5.0f)},  //Bottom Side   
 		Vertex{glm::vec3(0.5f, 0.0f, -0.5f),   glm::vec3(0.83f, 0.70f, 0.44f),   glm::vec3(0.0f, -1.0f, 0.0f),        glm::vec2(5.0f, 5.0f)},  //Bottom Side 
 		Vertex{glm::vec3(0.5f, 0.0f, 0.5f),    glm::vec3(0.83f, 0.70f, 0.44f),    glm::vec3(0.0f, -1.0f, 0.0f),       glm::vec2(5.0f, 0.0f)},  //Bottom Side   
-																												      
+
 		Vertex{glm::vec3(-0.5f, 0.0f, 0.5f),   glm::vec3(0.83f, 0.70f, 0.44f),    glm::vec3(-0.8f, 0.5f, 0.0f),       glm::vec2(0.0f, 0.0f)},     //Left Side
 		Vertex{glm::vec3(-0.5f, 0.0f, -0.5f),   glm::vec3(0.83f, 0.70f, 0.44f),    glm::vec3(-0.8f, 0.5f, 0.0f),      glm::vec2(5.0f, 0.0f)},  //Left Side
 		Vertex{glm::vec3(0.0f, 0.8f, 0.0f),     glm::vec3(0.92f, 0.86f, 0.76f),      glm::vec3(-0.8f, 0.5f, 0.0f),    glm::vec2(2.5f, 5.0f)},   //Left Side
-																												      
+
 		Vertex{glm::vec3(-0.5f, 0.0f, -0.5f),   glm::vec3(0.83f, 0.70f, 0.44f),     glm::vec3(0.0f, 0.5f, -0.8f),     glm::vec2(5.0f, 0.0f)},  //Non-facing side
 		Vertex{glm::vec3(0.5f, 0.0f, -0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),    glm::vec3(0.0f, 0.5f, -0.8f),     glm::vec2(0.0f, 0.0f)},  //Non-facing side  
 		Vertex{glm::vec3(0.0f, 0.8f, 0.0f),      glm::vec3(0.92f, 0.86f, 0.76f),      glm::vec3(0.0f, 0.5f, -0.8f),   glm::vec2(2.5f, 5.0f)},    //Non-facing side 
@@ -112,8 +112,8 @@ int main() {
 		Vertex{glm::vec3(0.5f, 0.0f, -0.5f),     glm::vec3(0.83f, 0.70f, 0.44),      glm::vec3(0.8f, 0.5f, 0.0f),     glm::vec2(0.0f, 0.0f)},   //Right Side
 		Vertex{glm::vec3(0.5f, 0.0f, 0.5f),      glm::vec3(0.83f, 0.70f, 0.44),      glm::vec3(0.8f, 0.5f, 0.0f),     glm::vec2(5.0f, 0.0f)},  //Right Side   
 		Vertex{glm::vec3(0.0f, 0.8f, 0.0f),      glm::vec3(0.92f, 0.86f, 0.76),      glm::vec3(0.8f, 0.5f, 0.0f),     glm::vec2(2.5f, 5.0f)},  //Right Side  
-																											
-																			
+
+
 		Vertex{glm::vec3(0.5f, 0.0f, 0.5f),      glm::vec3(0.83f, 0.70f, 0.44f),       glm::vec3(0.0f, 0.5f, 0.8f),     glm::vec2(5.0f, 0.0f)},  //Facing Side   
 		Vertex{glm::vec3(-0.5f, 0.0f, 0.5f),     glm::vec3(0.83f, 0.70f, 0.44f),       glm::vec3(0.0f, 0.5f, 0.8f),     glm::vec2(0.0f, 0.0f)},  //Facing Side     
 		Vertex{glm::vec3(0.0f, 0.8f, 0.0f),      glm::vec3(0.92f, 0.86f, 0.76f),       glm::vec3(0.0f, 0.5f, 0.8f),     glm::vec2(2.5f, 5.0f)}  //Facing Side    
@@ -212,12 +212,13 @@ int main() {
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
-	
+
 
 	//--------------Pyramid---------------------------------
 	//Angle input
 	float angle = 0;
 	glm::vec3 scalepyr = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 rotpyr = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f); //X, Y, Z
 	glm::mat4 pyramidModel = glm::mat4(1.0f);
@@ -243,7 +244,7 @@ int main() {
 
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 	while (!glfwWindowShouldClose(window)) {
-		
+
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -257,7 +258,7 @@ int main() {
 		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 proj = glm::mat4(1.0f);
-		
+
 		//Tells opengl what shader program we're gonna use
 		shaderProgram.Activate();
 
@@ -269,7 +270,11 @@ int main() {
 		glm::mat4 Loc = roml::translate(glm::mat4(1.0f), pyramidPos);
 		glm::mat4 Soc = roml::scale(glm::mat4(1.0f), scalepyr);
 
-		pyramidModel = Loc * Soc;
+		glm::mat4 rotX = roml::rotate(glm::mat4(1.0f), roml::radians(rotpyr.x), 'X');
+		glm::mat4 rotY = roml::rotate(glm::mat4(1.0f), roml::radians(rotpyr.y), 'Y');
+		glm::mat4 rotZ = roml::rotate(glm::mat4(1.0f), roml::radians(rotpyr.z), 'Z');
+		glm::mat4 Rot = rotZ * rotY * rotX;
+		pyramidModel = Loc * Rot * Soc;
 		//-----------------------Pyramid Control-----------------------------
 
 		//Exporting data
@@ -297,9 +302,9 @@ int main() {
 			ImGui::Begin("Debug Light");
 
 			bool resetPos = false;
-			ImGui::Text("Light Controls");   
+			ImGui::Text("Light Controls");
 			ImGui::Dummy(ImVec2(0.0f, 5.0f));
-			ImGui::SliderFloat("Translation X", &lightPos.x, -10.0f, 10.0f); 
+			ImGui::SliderFloat("Translation X", &lightPos.x, -10.0f, 10.0f);
 			ImGui::SliderFloat("Translation Y", &lightPos.y, -10.0f, 10.0f);
 			ImGui::SliderFloat("Translation Z", &lightPos.z, -10.0f, 10.0f);
 			if (ImGui::Button("Reset Position"))
@@ -322,6 +327,7 @@ int main() {
 
 			bool resetScale = false;
 			bool resetPos = false;
+			bool resetRot = false;
 			ImGui::Text("Mesh Controls");
 			ImGui::Dummy(ImVec2(0.0f, 5.0f));
 			ImGui::SliderFloat("Scale X", &scalepyr.x, 0.0f, 10.0f);
@@ -349,6 +355,17 @@ int main() {
 				pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
 			}
 
+			ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+			ImGui::SliderFloat("Rotation X", &rotpyr.x, -90.0f, 90.0f);
+			ImGui::SliderFloat("Rotation Y", &rotpyr.y, -90.0f, 90.0f);
+			ImGui::SliderFloat("Rotation Z", &rotpyr.z, -90.0f, 90.0f);
+			if (ImGui::Button("Reset Rotation"))
+				resetRot = true;
+
+			if (resetRot == true) {
+				rotpyr = glm::vec3(1.0f, 1.0f, 1.0f);
+			}
 
 
 			ImGui::Dummy(ImVec2(0.0f, 5.0f));
